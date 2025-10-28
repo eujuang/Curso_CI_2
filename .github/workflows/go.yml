@@ -8,34 +8,33 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        go_version: ['1.17', '1.18']  # removei ">=1.18"
-        os: ['ubuntu-latest']         # removei ubuntu-18.04
+        go_version: ['1.17', '1.18', '1.22']  
+        os: ['ubuntu-latest', 'ubuntu-20.04'] 
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0   
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go_version }}
 
-      - name: Build-DB
+      - name: Build DB images
         run: docker compose build
 
-      - name: Create-DB
+      - name: Start DB
         run: docker compose up -d
 
       - name: Test
-        run: go test -v main_test.go
-        # dica: se vc tiver mais pacotes, troca pra "go test -v ./..."
-
+        run: go test -v ./...
+        
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -46,10 +45,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Go
+      - name: Set up Go (stable)
         uses: actions/setup-go@v4
         with:
-          go-version: '1.18'
+          go-version: '1.22'   
 
-      - name: Build
+      - name: Build binary
         run: go build -v main.go
