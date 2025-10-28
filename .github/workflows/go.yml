@@ -7,14 +7,14 @@ on:
     branches: [ "*" ]
 
 jobs:
+
   test:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go_version: ['1.17', '1.18', '1.22']  
-        os: ['ubuntu-latest', 'ubuntu-20.04'] 
-
-    runs-on: ${{ matrix.os }}
-
+        go_version: ['1.18', '1.17', '>=1.18']
+                os: ['ubuntu-latest', 'ubuntu-18.04'] 
+                
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,9 +35,9 @@ jobs:
       - name: Test
         run: go test -v ./...
         
-  build:
+build:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
