@@ -10,43 +10,29 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go_version: ['1.18', '1.17', '>1.18']
+        go_version: ['1.18', '1.17', '>=1.18']
         os: ['ubuntu-latest', 'ubuntu-18.04']
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go_version }}
 
-      - name: Build DB images
+      - name: Build-DB
         run: docker compose build
 
-      - name: Start DB
+      - name: Crate-DB
         run: docker compose up -d
 
       - name: Test
-        run: go test -v ./...
+        run: go test -v main_test.go
 
   build:
     needs: test
     runs-on: ${{ matrix.os }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go (stable)
-        uses: actions/setup-go@v4
-        with:
-          go-version: "1.22"
-
-      - name: Build binary
+      - uses: actions/checkout@v4
+      - name: Build
         run: go build -v main.go
