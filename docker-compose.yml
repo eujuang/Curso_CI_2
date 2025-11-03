@@ -1,28 +1,28 @@
-version: '3'
+version: '3.8'
+
 services:
   postgres:
-    image: "postgres"
+    image: postgres:14
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=root      
-  ports:
-      - "5432:5432"   # precisa disso para o go test (no host) acessar em localhost:5432
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: root
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U root"]
       interval: 5s
       timeout: 5s
       retries: 20
     volumes:
-      - /postgres-data:/var/lib/postgresql/data  
+      - ./postgres-data:/var/lib/postgresql/data
 
-  pgadmin-compose:
+  pgadmin:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: "gui@alura.com"
+      PGADMIN_DEFAULT_EMAIL: gui@alura.com
       PGADMIN_DEFAULT_PASSWORD: "123456"
     ports:
       - "54321:80"
     depends_on:
       - postgres
-
