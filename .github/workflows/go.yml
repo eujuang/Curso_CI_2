@@ -6,10 +6,16 @@ on:
   pull_request:
     branches: ['*']
 
+# <<< coloque o caminho onde está o go.mod >>>
+defaults:
+  run:
+    working-directory: ./Projeto_base
+
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    # Remova isto se não usa DB nos testes
     services:
       postgres:
         image: postgres:14
@@ -37,9 +43,18 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
+      # Só para confirmar que estamos no diretório certo
+      - name: Show tree
+        run: |
+          pwd
+          ls -la
+          cat go.mod
+
+      - name: Download deps
+        run: go mod download
+
       - name: Run tests
         env:
-          # ajuste para a env que seu código realmente lê
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/appdb?sslmode=disable
         run: go test -v ./...
 
@@ -51,4 +66,5 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.18.x'
+      # mesmo diretório do defaults.run
       - run: go build -v ./...
