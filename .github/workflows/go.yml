@@ -37,13 +37,9 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - name: Sanity check DB
-        run: |
-          sudo apt-get update && sudo apt-get install -y netcat
-          nc -zv localhost 5432
-
       - name: Run tests
         env:
+          # ajuste para a env que seu código realmente lê
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/appdb?sslmode=disable
         run: go test -v ./...
 
