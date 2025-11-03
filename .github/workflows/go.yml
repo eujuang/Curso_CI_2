@@ -9,6 +9,22 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: appdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
     strategy:
       fail-fast: false
       matrix:
@@ -21,26 +37,10 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - name: Build DB images
-        run: docker compose build
-
-      - name: Start DB
-        run: docker compose up -d
-
-      # Ajuste o nome do serviço (db) e o usuário conforme seu docker-compose.yml
-      - name: Wait for DB (Postgres)
-        shell: bash
+      - name: Sanity check DB
         run: |
-          for i in {1..60}; do
-            if docker compose exec -T db pg_isready -U postgres >/dev/null 2>&1; then
-              echo "DB pronto"
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "DB não ficou pronto"
-          docker compose logs
-          exit 1
+          sudo apt-get update && sudo apt-get install -y netcat
+          nc -zv localhost 5432
 
       - name: Run tests
         env:
