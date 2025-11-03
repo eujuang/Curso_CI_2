@@ -6,8 +6,13 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=root      
-    ports:
-      - "5432:5432"
+  ports:
+      - "5432:5432"   # precisa disso para o go test (no host) acessar em localhost:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     volumes:
       - /postgres-data:/var/lib/postgresql/data  
 
