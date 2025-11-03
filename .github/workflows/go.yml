@@ -14,13 +14,13 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: appdb
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: root
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres"
+          --health-cmd="pg_isready -U root"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=20
@@ -37,12 +37,13 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - name: Download dependencies
+      - name: Baixar dependências
         run: go mod download
 
-      - name: Run tests
+      - name: Rodar testes
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/appdb?sslmode=disable
+          # use o mesmo DSN que seu código espera; se for diferente, ajuste o nome da variável
+          DATABASE_URL: postgres://root:root@localhost:5432/root?sslmode=disable
         run: go test -v ./...
 
   build:
@@ -53,5 +54,4 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.18.x'
-      - name: Build
-        run: go build -v ./...
+      - run: go build -v ./...
