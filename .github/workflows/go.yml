@@ -7,8 +7,13 @@ on:
     branches: ['*']
 
 jobs:
+  # Testes com Postgres (services só funcionam em Linux)
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.17.x', '1.18.x']
 
     services:
       postgres:
@@ -25,11 +30,6 @@ jobs:
           --health-timeout=5s
           --health-retries=20
 
-    strategy:
-      fail-fast: false
-      matrix:
-        go: ['1.17.x', '1.18.x']
-
     steps:
       - uses: actions/checkout@v4
 
@@ -37,21 +37,28 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - name: Baixar dependências
+      - name: Download deps
         run: go mod download
 
-      - name: Rodar testes
+      - name: Run tests
         env:
-          # use o mesmo DSN que seu código espera; se for diferente, ajuste o nome da variável
+          # ajuste se seu app usa outro nome de variável
           DATABASE_URL: postgres://root:root@localhost:5432/root?sslmode=disable
         run: go test -v ./...
 
+  # Build em matriz de sistemas operacionais (sem DB)
   build:
     needs: test
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        go: ['1.18.x']
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.18.x'
-      - run: go build -v ./...
+          go-version: ${{ matrix.go }}
+      - name: Build
+        run: go build -v ./...
