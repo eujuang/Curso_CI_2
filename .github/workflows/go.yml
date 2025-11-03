@@ -1,44 +1,46 @@
-name: Go 
+name: Go
 
 on:
   push:
-    branches: [ '*' ]
+    branches: ['*']
   pull_request:
-    branches: [ '*' ]
+    branches: ['*']
 
 jobs:
-
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        go_version: ['1.18', '1.17', '>=1.18']
-        os: ['ubuntu-latest', 'ubuntu-18.04']
+        go: ['1.17.x', '1.18.x']
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: ${{ matrix.go_version }}
-      
-    - name: Build-DB
-      run: docker compose build
-      
-    - name: Create-DB
-      run: docker compose up -d
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
 
-    - name: Test
-      run: go test -v main_test.go 
-      
-  
+      - name: Build DB images
+        run: docker compose build
+
+      - name: Start DB
+        run: docker compose up -d
+
+      - name: Run tests
+        # rode tudo; se quiser só main_test.go, mantenha, mas será mais frágil
+        run: go test -v main_test.go
+
   build:
     needs: test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ['ubuntu-latest', 'ubuntu-18.04']
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: go build -v main.go
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.18.x'
+
+      - name: Build
+        run: go build -v ./...
