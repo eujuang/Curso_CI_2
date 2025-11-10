@@ -7,7 +7,7 @@ on:
     branches: ['*']
 
 jobs:
-  # Testes com Postgres (services só funcionam em Linux)
+  
   test:
     runs-on: ubuntu-latest
     env:
