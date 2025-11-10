@@ -10,6 +10,12 @@ jobs:
   # Testes com Postgres (services só funcionam em Linux)
   test:
     runs-on: ubuntu-latest
+    env:
+      HOST: localhost
+      PORT: 5432
+      USER: root
+      PASSWORK: root
+      DBNAME: root
     strategy:
       fail-fast: false
       matrix:
