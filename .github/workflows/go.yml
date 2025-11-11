@@ -14,7 +14,7 @@ jobs:
       HOST: localhost
       PORT: 5432
       USER: root
-      PASSWORK: root
+      PASSWORD: root
       DBNAME: root
     strategy:
       fail-fast: false
