@@ -68,3 +68,8 @@ jobs:
           go-version: ${{ matrix.go }}
       - name: Build
         run: go build -v ./...
+
+
+docker:
+  needs: build
+  uses: ./.github/workflows/Docker.yml
