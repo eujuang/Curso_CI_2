@@ -70,6 +70,7 @@ jobs:
         run: go build -v ./...
 
 
-docker:
-  needs: build
-  uses: ./.github/workflows/Docker.yml
+  docker:
+    needs: build
+    uses: ./.github/workflows/Docker.yml
+    secrets: inherit 
