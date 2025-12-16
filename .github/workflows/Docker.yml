@@ -17,12 +17,11 @@ jobs:
         with:
           username: eujuang
           password: ${{ secrets.PASSWORD_DOCKER_HUB }}
+
       - name: Build and push Docker images
-  uses: docker/build-push-action@v6.18.0
-  with:
-    context: .
-    file: ./Dockerfile
-    push: true
-    tags: eujuang/go_ci:${{ github.ref_name }}
-
-
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: eujuang/go_ci:${{ github.ref_name }}
