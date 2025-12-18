@@ -48,29 +48,30 @@ jobs:
 
       - name: Run tests
         env:
-          # ajuste se seu app usa outro nome de variável
           DATABASE_URL: postgres://root:root@localhost:5432/root?sslmode=disable
         run: go test -v ./...
 
-  # Build em matriz de sistemas operacionais (sem DB)
   build:
     needs: test
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        go: ['1.22.x']
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
+
       - name: Build
         run: go build -v ./...
 
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: programa
+          path: main 
 
-  docker:
-    needs: build
-    uses: ./.github/workflows/Docker.yml
-    secrets: inherit 
+    docker:
+      needs: build
+      uses: ./.github/workflows/Docker.yml
+      secrets: inherit
